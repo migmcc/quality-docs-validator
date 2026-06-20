@@ -9,7 +9,7 @@ description = "Local-first, forkable validator that detects potential inconsiste
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
-authors = [{ name = "Miguel Santos", email = "migmcc@gmail.com" }]
+authors = [{ name = "Miguel Santos", email = "22058800+migmcc@users.noreply.github.com" }]
 keywords = ["quality", "pfmea", "control-plan", "apqp", "ppap", "automotive", "validation"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
