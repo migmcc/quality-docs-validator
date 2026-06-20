@@ -1,6 +1,6 @@
 # PFMEA ↔ Control Plan Validation Report
 
-- **Generated:** 2026-06-20 13:47 UTC
+- **Generated:** 2026-06-20 13:54 UTC
 - **PFMEA:** `pfmea.xlsx` (4 rows)
 - **Control Plan:** `control-plan.xlsx` (3 rows)
 

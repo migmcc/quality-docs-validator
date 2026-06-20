@@ -23,7 +23,21 @@ from ..models import ControlPlanRow, Finding, PFMEARow, ValidationResult
 from ..parsers.excel import parse_control_plan, parse_pfmea
 
 HIGH_SEVERITY_THRESHOLD = 8
-WEAK_METHOD_KEYWORDS = ("visual", "operator", "manual", "look", "by eye", "naked eye")
+
+# Phrases that indicate a subjective / low-reliability detection method. Kept deliberately
+# specific (phrases, not bare words like "operator" or "manual") to limit false positives:
+# e.g. "manual gauge" or "operator runs CMM" are NOT weak, but "manual inspection" is.
+# Because these checks are the most false-positive-prone, both rules they feed are WARNINGS (D3).
+WEAK_METHOD_KEYWORDS = (
+    "visual",
+    "by eye",
+    "naked eye",
+    "look",
+    "operator check",
+    "operator visual",
+    "manual inspection",
+    "manual check",
+)
 
 
 def _is_weak_method(method: str | None) -> bool:

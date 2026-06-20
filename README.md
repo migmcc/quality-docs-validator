@@ -49,6 +49,28 @@ This runs against the bundled synthetic examples (which contain a deliberately s
 writes `report.md` plus a terminal summary. Regenerate the examples with
 `python examples/generate_examples.py`.
 
+Expected terminal summary (abridged):
+
+```text
+                       Potential findings
+  Type                                   Level     Op  Detail
+ ─────────────────────────────────────────────────────────────────
+  UNMATCHED_PROCESS_STEP                 warning   40  no Control Plan row
+  SPECIAL_CHARACTERISTIC_NOT_CONTROLLED  critical  20  not marked special in CP
+  MISSING_REACTION_PLAN                  critical  20  S=9, no reaction plan
+  WEAK_DETECTION_METHOD                  warning   20  visual inspection
+  HIGH_SEVERITY_WEAK_CONTROL             warning   20  S=9 + weak control
+  MISSING_CONTROL                        critical  30  no control method
+
+╭───────────────── quality-docs-validator ─────────────────╮
+│ Score: 43/100   Verdict: FAIL   Critical: 3   Warnings: 3 │
+╰───────────────────────────────────────────────────────────╯
+```
+
+The full Markdown report is written to `report.md`; a committed sample lives at
+[examples/report.md](examples/report.md). Finding types and scoring are documented in
+[docs/FINDINGS.md](docs/FINDINGS.md).
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the module layout and data flow.

@@ -56,12 +56,38 @@ src/quality_docs_validator/
 | `core/report.py` | Render Markdown report (jinja2) + rich terminal summary, with human-review footer. |
 | `cli.py` | `pfmea-control-plan` command wiring the pipeline together. |
 
+## Matching model
+Rows are matched by a **normalised `operation_id`** (`core/matching.py`): lower-cased with
+non-alphanumeric characters stripped, so `Op 10`, `op-10` and `10` collapse to the same key. PFMEA
+and Control Plan rows are grouped per operation; an operation present in only one document is
+surfaced as `UNMATCHED_PROCESS_STEP` rather than dropped. Duplicate rows for one operation are
+grouped and evaluated together. Matching by description/fuzzy keys is out of MVP scope.
+
 ## Scoring model
-Each finding type carries a severity weight; critical findings cost more than warnings. The score
-starts at 100 and is reduced by weighted findings, then mapped to a verdict band. Exact weights are
-defined alongside the rules and tuned against the synthetic examples (kept conservative to limit
-false positives — see [DECISIONS.md](DECISIONS.md) D3).
+Score starts at 100 and is reduced per finding: **critical −15**, **warning −4**, clamped to
+`[0, 100]`. Verdict bands: `PASS` (no findings), `PASS-WITH-WARNINGS` (no criticals),
+`NEEDS-REVIEW` (a critical and score ≥ 50), `FAIL` (a critical and score < 50). Weights are kept
+conservative so warnings cannot dominate the verdict (false-positive protection, [DECISIONS.md](DECISIONS.md) D3).
+Full detail and the per-type rationale live in [FINDINGS.md](FINDINGS.md).
+
+## Rules: code vs. YAML
+For the MVP the six checks are implemented in `modules/pfmea_control_plan.py`. The
+`rules/pfmea_control_plan_rules.yaml` file is the single source of truth for each rule's **id and
+severity**, and a consistency test asserts the code and YAML never drift. Driving the check *logic*
+from YAML (a small rule-interpretation layer) is deferred to a later iteration — it was kept out of
+the hardening pass to avoid a rearchitecture.
+
+## Known limitations (MVP)
+- **`.xlsx` only**, single worksheet; the header row is auto-located within the first few rows but
+  merged/multi-line header cells are not specially handled.
+- **Recommended template + fixed aliases** only — no configurable column mapping (v0.2).
+- **Weak-method detection is heuristic** (phrase matching) and English-oriented; shipped as warnings.
+- **Matching is exact on normalised `operation_id`** — no fuzzy/description matching.
+- Single module (PFMEA ↔ Control Plan); other documents are out of scope.
 
 ## Testing strategy
-Unit tests per stage (parsing, matching, rules, scoring, report) plus an end-to-end test over the
-bundled synthetic examples asserting the seeded gap appears. CI runs on Windows + Linux.
+Unit tests per stage (parsing, matching, rules, scoring, report), edge-case/robustness tests
+(missing columns, non-`.xlsx`, empty workbook, non-numeric severity, missing/duplicate operation
+ids, extra columns, header not on row 1), a YAML↔code consistency test, and an end-to-end test over
+the bundled synthetic examples asserting the seeded gap appears. CI targets Windows + Linux,
+Python 3.12 and 3.13.

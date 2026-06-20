@@ -19,6 +19,18 @@ All notable changes to this project are documented here. The format is based on
 - `pfmea-control-plan` CLI command wired to the pipeline (`--pfmea`, `--control-plan`, `--out`).
 - Synthetic example workbooks with a seeded gap (`examples/generate_examples.py`) and end-to-end
   tests.
+- Hardening (Run D): parser now auto-locates the header row (tolerates a leading title row),
+  ignores extra columns, and raises clear errors for non-`.xlsx`, missing files, empty
+  workbooks/worksheets and missing `operation_id` columns.
+- `docs/FINDINGS.md` documenting all six finding types, the weak-method heuristic, scoring weights
+  and verdict bands; expanded `docs/ARCHITECTURE.md` (matching, scoring, limitations).
+- YAML↔code consistency: `rules.load_rule_specs()` plus a test asserting documented severities
+  match the emitted findings.
+- 12 edge-case/robustness tests and CI coverage reporting (`pytest-cov`).
+
+### Changed
+- `WEAK_DETECTION_METHOD` heuristic narrowed to specific phrases (no bare `operator`/`manual`) to
+  cut false positives; `WEAK_DETECTION_METHOD` and `HIGH_SEVERITY_WEAK_CONTROL` remain warnings.
 
 ### Notes
 - Validation rules are currently implemented in `modules/pfmea_control_plan.py`; the
