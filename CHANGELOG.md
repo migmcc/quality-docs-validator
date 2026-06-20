@@ -11,11 +11,19 @@ All notable changes to this project are documented here. The format is based on
   test/docs/examples structure, MIT license, CI stub.
 - Project documentation: `docs/DECISIONS.md`, `docs/MVP_SCOPE.md`, `docs/ARCHITECTURE.md`,
   `docs/ROADMAP.md`.
-- CLI entry points (`quality-docs-validator`, `qdv`) wired to a placeholder command.
+- **PFMEA ↔ Control Plan vertical slice** (functional): `.xlsx` parser with column aliases,
+  operation matching, six finding types (`UNMATCHED_PROCESS_STEP`, `MISSING_CONTROL`,
+  `SPECIAL_CHARACTERISTIC_NOT_CONTROLLED`, `MISSING_REACTION_PLAN`, `WEAK_DETECTION_METHOD`,
+  `HIGH_SEVERITY_WEAK_CONTROL`), severity-weighted scoring with verdict bands, Markdown report and
+  rich terminal summary.
+- `pfmea-control-plan` CLI command wired to the pipeline (`--pfmea`, `--control-plan`, `--out`).
+- Synthetic example workbooks with a seeded gap (`examples/generate_examples.py`) and end-to-end
+  tests.
 
 ### Notes
-- The validation engine is **not implemented yet**. This release line covers scaffold only;
-  the PFMEA ↔ Control Plan vertical slice lands in a subsequent build (see `docs/ROADMAP.md`).
+- Validation rules are currently implemented in `modules/pfmea_control_plan.py`; the
+  `rules/*.yaml` file documents them and will become the rule source in a later iteration.
+- Not yet released. JSON/HTML output, CSV input and configurable mapping remain roadmapped (v0.2).
 
 <!--
 ## [0.1.0] - YYYY-MM-DD

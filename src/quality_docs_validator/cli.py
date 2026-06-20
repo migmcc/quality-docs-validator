@@ -1,20 +1,27 @@
 """Command-line interface for quality-docs-validator.
 
-Scaffold stage: the `pfmea-control-plan` command is registered so the CLI wiring and
-entry points (`quality-docs-validator`, `qdv`) are real and testable, but the underlying
-checker is not implemented yet. It exits with a clear "not implemented" message.
+Entry points (`quality-docs-validator`, `qdv`) are defined in pyproject.toml. The MVP exposes a
+single command, `pfmea-control-plan`, which runs the checker, writes a Markdown report and prints a
+terminal summary.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import typer
+from rich.console import Console
 
 from . import __version__
+from .core.report import print_terminal_summary, write_markdown
+from .modules.pfmea_control_plan import check_files
+from .parsers.excel import ParseError
 
 app = typer.Typer(
     add_completion=False,
     help="Detect potential inconsistencies between PFMEA and Control Plan documents.",
 )
+console = Console()
 
 
 def _version_callback(value: bool) -> None:
@@ -38,21 +45,27 @@ def main(
 
 @app.command("pfmea-control-plan")
 def pfmea_control_plan(
-    pfmea: str = typer.Option(..., "--pfmea", help="Path to the PFMEA .xlsx file."),
-    control_plan: str = typer.Option(
+    pfmea: Path = typer.Option(..., "--pfmea", help="Path to the PFMEA .xlsx file."),
+    control_plan: Path = typer.Option(
         ..., "--control-plan", help="Path to the Control Plan .xlsx file."
     ),
-    output: str = typer.Option(
-        "reports/report.md", "--output", help="Path for the generated Markdown report."
+    out: Path = typer.Option(
+        Path("report.md"),
+        "--out",
+        "--output",
+        help="Path for the generated Markdown report.",
     ),
 ) -> None:
-    """Check a PFMEA against a Control Plan for potential inconsistencies. (Not implemented yet.)"""
-    typer.secho(
-        "pfmea-control-plan is not implemented yet — this is a scaffold build. "
-        "See docs/ROADMAP.md for the implementation plan.",
-        fg=typer.colors.YELLOW,
-    )
-    raise typer.Exit(code=1)
+    """Check a PFMEA against a Control Plan for potential inconsistencies."""
+    try:
+        result = check_files(pfmea, control_plan)
+    except ParseError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(code=2) from exc
+
+    write_markdown(result, pfmea.name, control_plan.name, out)
+    print_terminal_summary(result, pfmea.name, control_plan.name)
+    console.print(f"[dim]Report written to[/dim] {out}")
 
 
 if __name__ == "__main__":  # pragma: no cover

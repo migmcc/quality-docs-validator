@@ -1,10 +1,10 @@
-# PFMEA <-> Control Plan validation rules (PLACEHOLDER — not yet consumed by any code).
+# PFMEA <-> Control Plan validation rules.
 #
-# Each rule is explicit, documented and testable. The MVP must implement at least 5 of the
-# finding types below. Severity classification keeps the riskiest, false-positive-prone checks
-# as WARNINGS (see docs/DECISIONS.md D3).
+# These six finding types are IMPLEMENTED in src/quality_docs_validator/modules/pfmea_control_plan.py.
+# For now this file documents them (id, severity, description); a later iteration will make the
+# module consume this YAML directly so checks can be edited without touching Python.
 #
-# This file defines the *intended* shape only; the rule engine is implemented in Run C.
+# Severity classification keeps the riskiest, false-positive-prone checks as WARNINGS (DECISIONS.md D3).
 
 version: 0
 

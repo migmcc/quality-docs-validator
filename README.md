@@ -15,9 +15,10 @@ It **supports, and does not replace, human technical review.**
 
 ## Status
 
-🚧 **Pre-alpha — scaffold only.** The repository structure, packaging and documentation are in
-place. The validation engine (Excel parsing, matching, rules, scoring, reports) is the next phase
-(see [docs/ROADMAP.md](docs/ROADMAP.md)). No working checks are shipped yet.
+🧪 **Pre-alpha — working vertical slice.** The PFMEA ↔ Control Plan checker runs end to end:
+read two `.xlsx` files → match by operation → detect 6 finding types → score → Markdown report +
+terminal summary. Not yet released; rules are currently implemented in code (the YAML is
+documentation for now) and the engine is intentionally minimal. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## What the MVP (v0.1.0) will do
 
@@ -34,15 +35,19 @@ Scope is deliberately narrow. See [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md) and
 [docs/DECISIONS.md](docs/DECISIONS.md). `.xlsx`-only; CSV and configurable column mapping are
 planned for v0.2 ([docs/ROADMAP.md](docs/ROADMAP.md)).
 
-## Planned quickstart (not yet functional)
+## Quickstart
 
 ```bash
 pip install -e .
 qdv pfmea-control-plan \
   --pfmea examples/pfmea.xlsx \
   --control-plan examples/control-plan.xlsx \
-  --output reports/report.md
+  --out report.md
 ```
+
+This runs against the bundled synthetic examples (which contain a deliberately seeded gap) and
+writes `report.md` plus a terminal summary. Regenerate the examples with
+`python examples/generate_examples.py`.
 
 ## Architecture
 
