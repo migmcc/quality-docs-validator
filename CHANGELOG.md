@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- More common column-header aliases for both PFMEA and Control Plan (e.g. `Operation No`/`Op #`/
+  `Process No`, `Severity Rating`, `Detection Method`, `Special Characteristics`/`Key
+  Characteristic`/`Critical Characteristic`, `Control Technique`/`Measurement Technique`,
+  `Out of Control Action`). Existing aliases and behaviour are unchanged.
+  ([#2](https://github.com/migmcc/quality-docs-validator/issues/2))
 - JSON report output via `--format json` (Markdown remains the default). The JSON includes
   `metadata` (tool, version, UTC timestamp, format), `inputs`, `verdict`, `score`, a `summary`
   (counts by severity and by finding type) and the full `findings` list. Validation, scoring and
