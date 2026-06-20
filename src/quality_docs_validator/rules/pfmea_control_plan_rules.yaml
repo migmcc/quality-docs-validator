@@ -1,0 +1,45 @@
+# PFMEA <-> Control Plan validation rules (PLACEHOLDER — not yet consumed by any code).
+#
+# Each rule is explicit, documented and testable. The MVP must implement at least 5 of the
+# finding types below. Severity classification keeps the riskiest, false-positive-prone checks
+# as WARNINGS (see docs/DECISIONS.md D3).
+#
+# This file defines the *intended* shape only; the rule engine is implemented in Run C.
+
+version: 0
+
+rules:
+  - id: MISSING_CONTROL
+    severity: critical
+    description: >
+      A PFMEA failure mode / cause has no corresponding control in the Control Plan
+      for the matched operation.
+
+  - id: UNMATCHED_PROCESS_STEP
+    severity: warning
+    description: >
+      A process step / operation_id present in one document has no counterpart in the other
+      (surfaced rather than silently dropped).
+
+  - id: SPECIAL_CHARACTERISTIC_NOT_CONTROLLED
+    severity: critical
+    description: >
+      A special characteristic identified in the PFMEA is not present / not controlled in the
+      Control Plan's inspection plan.
+
+  - id: MISSING_REACTION_PLAN
+    severity: critical
+    description: >
+      A Control Plan control lacks a reaction plan where the matched PFMEA risk is high.
+
+  - id: WEAK_DETECTION_METHOD
+    severity: warning   # warning by decision D3 (false-positive-prone)
+    description: >
+      The Control Plan detection method appears weak relative to the PFMEA detection ranking.
+
+  - id: HIGH_SEVERITY_WEAK_CONTROL
+    severity: warning   # warning by decision D3 (false-positive-prone)
+    description: >
+      A high-severity failure mode is paired with a control judged weak for that severity.
+
+# Further finding types (to reach the 11 total) are defined as the engine matures.

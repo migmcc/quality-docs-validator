@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "quality-docs-validator"
+version = "0.1.0.dev0"
+description = "Local-first, forkable validator that detects potential inconsistencies between PFMEA and Control Plan quality documents."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Miguel Santos", email = "migmcc@gmail.com" }]
+keywords = ["quality", "pfmea", "control-plan", "apqp", "ppap", "automotive", "validation"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Manufacturing",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+]
+
+# Runtime dependencies planned for the MVP vertical slice (Run C).
+# Declared here so the scaffold installs cleanly; the engine itself is not implemented yet.
+dependencies = [
+    "openpyxl>=3.1",   # .xlsx reading (MVP input format, see docs/DECISIONS.md D1)
+    "pydantic>=2.6",   # PFMEARow / ControlPlanRow data models (Run B/C)
+    "typer>=0.12",     # CLI (`quality-docs-validator` / `qdv`)
+    "rich>=13.7",      # terminal summary
+    "jinja2>=3.1",     # Markdown report rendering
+    "pyyaml>=6.0",     # rule-file definitions
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/migmcc/quality-docs-validator"
+Repository = "https://github.com/migmcc/quality-docs-validator"
+Changelog = "https://github.com/migmcc/quality-docs-validator/blob/main/CHANGELOG.md"
+
+[project.scripts]
+quality-docs-validator = "quality_docs_validator.cli:app"
+qdv = "quality_docs_validator.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/quality_docs_validator"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
