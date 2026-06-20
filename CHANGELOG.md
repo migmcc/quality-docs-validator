@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- JSON report output via `--format json` (Markdown remains the default). The JSON includes
+  `metadata` (tool, version, UTC timestamp, format), `inputs`, `verdict`, `score`, a `summary`
+  (counts by severity and by finding type) and the full `findings` list. Validation, scoring and
+  matching behaviour are unchanged. ([#3](https://github.com/migmcc/quality-docs-validator/issues/3))
+
 ## [0.1.0] - 2026-06-20
 
 First public release — the PFMEA ↔ Control Plan consistency checker MVP.

@@ -1,28 +1,27 @@
 # Roadmap
 
-## v0.1.0 — MVP (PFMEA ↔ Control Plan checker)
-The single, narrow vertical slice. `.xlsx` only, recommended template + aliases, ≥5 finding types,
+## v0.1.0 — MVP (PFMEA ↔ Control Plan checker) ✅ released
+The single, narrow vertical slice. `.xlsx` only, recommended template + aliases, six finding types,
 severity-weighted score, Markdown report + terminal summary, synthetic examples, tests, docs.
-See [MVP_SCOPE.md](MVP_SCOPE.md).
+See [MVP_SCOPE.md](MVP_SCOPE.md). All work packages (repo skeleton, data models, Excel parser,
+matching, rules, scoring, report, CLI, examples, tests + CI, docs, release) are complete.
 
-**Build sequence (work packages):**
-- WP1 ✅ Repo skeleton & packaging *(this scaffold)*
-- WP2 ⏳ Data models (`PFMEARow`, `ControlPlanRow`, `Finding`) + column-alias map
-- WP3 ⏳ Excel parser (`parsers/excel.py`)
-- WP4 ⏳ Matching engine (`core/matching.py`)
-- WP5 ⏳ Validation rules (`modules/pfmea_control_plan.py` + `rules/*.yaml`)
-- WP6 ⏳ Scoring (`core/scoring.py`)
-- WP7 ⏳ Report generator (`core/report.py`)
-- WP8 ⏳ CLI command body (`cli.py`)
-- WP9 ⏳ Synthetic examples with a seeded gap
-- WP10 ⏳ Tests + Windows/Linux CI
-- WP11 ⏳ Docs & ≥3 good-first-issues
-- WP12 ⏳ Release v0.1.0
+## v0.2 — planned
+Improve interoperability and real-world workbook compatibility while keeping the tool focused on
+PFMEA ↔ Control Plan validation. Tracked under the
+[v0.2 milestone](https://github.com/migmcc/quality-docs-validator/milestone/1). Recommended order:
 
-## v0.2 — Flexibility
-- **CSV input** (in addition to `.xlsx`).
-- **Configurable column mapping** (beyond recommended template + aliases).
-- **JSON / HTML report** output; GitHub Action summary; status badges.
+1. **JSON output** ([#3](https://github.com/migmcc/quality-docs-validator/issues/3)) — first PR; a
+   machine-readable report alongside Markdown (Markdown stays the default).
+2. **More PFMEA / Control Plan column aliases**
+   ([#2](https://github.com/migmcc/quality-docs-validator/issues/2)) — broaden real-template coverage.
+3. **Multi-sheet workbooks** ([#4](https://github.com/migmcc/quality-docs-validator/issues/4)) —
+   optional sheet selection.
+4. **YAML-driven rules** ([#1](https://github.com/migmcc/quality-docs-validator/issues/1)) —
+   *stretch / optional*; a rule-engine refactor, deferred to v0.3 if scope grows.
+
+Still out of scope for v0.2: CSV input, configurable column mapping, HTML output, UI, AI, and any
+new document pairs. No dates promised.
 
 ## v0.3+ — More modules (each independent of the core)
 - Process Flow ↔ PFMEA consistency.

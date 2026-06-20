@@ -7,6 +7,8 @@ human technical review.
 
 from __future__ import annotations
 
+import json
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,7 +16,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from .. import __version__
 from ..models import ValidationResult
+
+TOOL_NAME = "quality-docs-validator"
 
 HUMAN_REVIEW_FOOTER = (
     "> ⚠️ These are **potential** findings to support human review. "
@@ -71,6 +76,68 @@ def write_markdown(
         out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(
         render_markdown(result, pfmea_name, control_plan_name), encoding="utf-8"
+    )
+    return out_path
+
+
+def build_report_data(
+    result: ValidationResult, pfmea_name: str, control_plan_name: str
+) -> dict:
+    """Build a stable, serialisable dict describing a validation run (used for JSON output).
+
+    Field names are chosen for automation consumers: findings expose `severity` (the model's
+    internal `level`). Scoring/matching/validation logic is untouched — this only reshapes output.
+    """
+    by_type: dict[str, int] = dict(Counter(f.finding_type for f in result.findings))
+    return {
+        "metadata": {
+            "tool": TOOL_NAME,
+            "version": __version__,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "format": "json",
+        },
+        "inputs": {
+            "pfmea": {"file": pfmea_name, "rows": result.pfmea_rows},
+            "control_plan": {"file": control_plan_name, "rows": result.control_plan_rows},
+        },
+        "verdict": result.verdict,
+        "score": result.score,
+        "summary": {
+            "total": len(result.findings),
+            "by_severity": {
+                "critical": result.critical_count,
+                "warning": result.warning_count,
+            },
+            "by_type": by_type,
+        },
+        "findings": [
+            {
+                "type": f.finding_type,
+                "severity": f.level,
+                "operation_id": f.operation_id,
+                "message": f.message,
+            }
+            for f in result.findings
+        ],
+    }
+
+
+def render_json(result: ValidationResult, pfmea_name: str, control_plan_name: str) -> str:
+    return json.dumps(
+        build_report_data(result, pfmea_name, control_plan_name),
+        indent=2,
+        ensure_ascii=False,
+    )
+
+
+def write_json(
+    result: ValidationResult, pfmea_name: str, control_plan_name: str, out_path: str | Path
+) -> Path:
+    out_path = Path(out_path)
+    if out_path.parent and not out_path.parent.exists():
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        render_json(result, pfmea_name, control_plan_name) + "\n", encoding="utf-8"
     )
     return out_path
 
