@@ -1,39 +1,55 @@
 # quality-docs-validator
 
+[![CI](https://github.com/migmcc/quality-docs-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/migmcc/quality-docs-validator/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
+
 > Detect **potential inconsistencies between PFMEA and Control Plan** before audits, customer
 > submissions or production issues — locally, with simple files, explicit rules and clear reports.
 
 `quality-docs-validator` (CLI: `qdv`) is a **local-first, forkable** tool for quality engineers.
-Manual review checks documents one by one, but the real risk lives *between* them: a high-severity
-PFMEA failure mode with no matching Control Plan control, a special characteristic missing from the
-inspection plan, a missing reaction plan exactly where risk is highest. This tool cross-checks the
+
+## The problem
+
+Quality documents are reviewed one at a time, but the real risk lives **between** them: a
+high-severity PFMEA failure mode with no matching Control Plan control, a special characteristic
+missing from the inspection plan, a missing reaction plan exactly where risk is highest. These gaps
+surface late — at audits, customer submissions or as field complaints. This tool cross-checks the
 two documents and surfaces those gaps as **severity-classified potential findings**.
 
-It **supports, and does not replace, human technical review.**
+> ⚠️ It **supports, and does not replace, human technical review.** Findings are *potential*
+> inconsistencies for an engineer to judge; the tool makes no regulatory or normative conformance
+> claim.
 
----
+## Who it's for
 
-## Status
+Quality / Process / Manufacturing Engineers, SQEs, internal auditors and APQP/PPAP teams — and
+anyone using coding agents to automate quality workflows. Runs entirely on your machine, so
+confidential supplier/customer data never leaves it.
 
-🧪 **Pre-alpha — working vertical slice.** The PFMEA ↔ Control Plan checker runs end to end:
-read two `.xlsx` files → match by operation → detect 6 finding types → score → Markdown report +
-terminal summary. Not yet released; rules are currently implemented in code (the YAML is
-documentation for now) and the engine is intentionally minimal. See [docs/ROADMAP.md](docs/ROADMAP.md).
-
-## What the MVP (v0.1.0) will do
+## What it validates
 
 A single module: **PFMEA ↔ Control Plan consistency checker**.
 
-- Read a PFMEA `.xlsx` and a Control Plan `.xlsx` (recommended template + simple column aliases).
-- Match rows by `operation_id` / `process_step`.
-- Run explicit, documented rules producing **≥5 finding types**.
-- Compute a **severity-weighted score (0–100)** with verdict bands
+- Reads a PFMEA `.xlsx` and a Control Plan `.xlsx` (recommended template + simple column aliases).
+- Matches rows by `operation_id` / process step.
+- Applies six explicit, documented checks (see [docs/FINDINGS.md](docs/FINDINGS.md)):
+  `UNMATCHED_PROCESS_STEP`, `MISSING_CONTROL`, `SPECIAL_CHARACTERISTIC_NOT_CONTROLLED`,
+  `MISSING_REACTION_PLAN`, `WEAK_DETECTION_METHOD` (warning), `HIGH_SEVERITY_WEAK_CONTROL` (warning).
+- Computes a **severity-weighted score (0–100)** with verdict bands
   (PASS / PASS-WITH-WARNINGS / NEEDS-REVIEW / FAIL).
-- Generate a **Markdown report** plus a **rich terminal summary**.
+- Generates a **Markdown report** plus a **rich terminal summary**.
 
-Scope is deliberately narrow. See [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md) and
-[docs/DECISIONS.md](docs/DECISIONS.md). `.xlsx`-only; CSV and configurable column mapping are
-planned for v0.2 ([docs/ROADMAP.md](docs/ROADMAP.md)).
+## What it does *not* validate (by design)
+
+- ❌ CSV / other input formats — `.xlsx` only (CSV planned for v0.2).
+- ❌ Configurable column mapping — recommended template + fixed aliases only (v0.2).
+- ❌ Other document pairs (Process Flow ↔ PFMEA, Work Instructions, PPAP, 8D, SPC, MSA).
+- ❌ Web UI, ERP/MES/QMS integration, PDF/OCR, or any AI dependency.
+- ❌ Regulatory/standard conformance certification, or replacing human judgement.
+
+Scope is deliberately narrow — see [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md),
+[docs/DECISIONS.md](docs/DECISIONS.md) and the [roadmap](docs/ROADMAP.md).
 
 ## Quickstart
 

@@ -1,7 +1,7 @@
 # Decisions
 
-Locked decisions carried into the repository from incubation (confirmed 2026-06-18). These are
-binding for the v0.1.0 MVP.
+Locked design decisions for the project. These are binding for the v0.1.0 MVP and explain why the
+scope is deliberately narrow.
 
 ## D1 — MVP input format
 **`.xlsx` only.** CSV input is deferred to v0.2. Reduces ambiguity and parsing surface for the MVP.
@@ -14,9 +14,9 @@ mapping in the MVP (deferred to v0.2).
 `WEAK_DETECTION_METHOD` and `HIGH_SEVERITY_WEAK_CONTROL` ship as **warnings**, not critical
 findings, to reduce false positives until validated against real examples.
 
-## D4 — Project location
-Standalone, durable repository at `D:\Trabalho\quality-docs-validator` — sibling of
-`D:\Trabalho\SkillLab`. Intended to be published public and MIT-licensed.
+## D4 — Distribution
+Standalone, public, MIT-licensed and forkable repository. Local-first by design: everything runs on
+the user's machine, with no upload of potentially confidential quality data.
 
 ## Carried-forward (pre-decided in the source brief)
 - First and only MVP module: **PFMEA ↔ Control Plan**.

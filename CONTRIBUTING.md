@@ -26,7 +26,13 @@ Target runtime is **Python 3.12+**.
 ## Pull requests
 
 - Keep PRs focused and small.
-- Add or update tests for any behaviour change.
+- Add or update tests for any behaviour change (`ruff check .` and `pytest` must pass).
 - Update `CHANGELOG.md` under `[Unreleased]`.
+- Reference the issue you're addressing.
 
-Good first issues will be labelled `good first issue` once the vertical slice lands.
+## Good first issues
+
+New here? Look for the [`good first issue`](https://github.com/migmcc/quality-docs-validator/labels/good%20first%20issue)
+label. Current candidates include more column aliases, JSON report output, multi-sheet workbook
+support and richer synthetic examples — all additive and within the v0.2 roadmap. Please open or
+comment on an issue before starting larger work so we can confirm it fits the scope.

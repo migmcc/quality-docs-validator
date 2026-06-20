@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-20
+
+First public release — the PFMEA ↔ Control Plan consistency checker MVP.
+
 ### Added
 - Initial repository scaffold: packaging (`pyproject.toml`, Python 3.12+), `src/` layout,
   test/docs/examples structure, MIT license, CI stub.
@@ -34,11 +38,9 @@ All notable changes to this project are documented here. The format is based on
 
 ### Notes
 - Validation rules are currently implemented in `modules/pfmea_control_plan.py`; the
-  `rules/*.yaml` file documents them and will become the rule source in a later iteration.
-- Not yet released. JSON/HTML output, CSV input and configurable mapping remain roadmapped (v0.2).
+  `rules/*.yaml` file documents them (id + severity, kept in sync by a test) and will become the
+  rule source in a later iteration.
+- JSON/HTML output, CSV input and configurable column mapping remain roadmapped (v0.2).
 
-<!--
-## [0.1.0] - YYYY-MM-DD
-First functional MVP: PFMEA ↔ Control Plan checker, ≥5 finding types, Markdown report,
-terminal summary, bundled examples.
--->
+[Unreleased]: https://github.com/migmcc/quality-docs-validator/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/migmcc/quality-docs-validator/releases/tag/v0.1.0
