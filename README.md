@@ -87,6 +87,21 @@ The full Markdown report is written to `report.md`; a committed sample lives at
 [examples/report.md](examples/report.md). Finding types and scoring are documented in
 [docs/FINDINGS.md](docs/FINDINGS.md).
 
+### JSON output
+
+For automation, emit a machine-readable report with `--format json`:
+
+```bash
+qdv pfmea-control-plan \
+  --pfmea examples/pfmea.xlsx \
+  --control-plan examples/control-plan.xlsx \
+  --format json --out report.json
+```
+
+Markdown remains the default. The JSON contains `metadata` (tool, version, UTC timestamp),
+`verdict`, `score`, a `summary` (counts by severity and by finding type) and the full `findings`
+list.
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the module layout and data flow.
