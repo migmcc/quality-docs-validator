@@ -168,10 +168,19 @@ def evaluate(match: MatchResult) -> list[Finding]:
     return findings
 
 
-def check_files(pfmea_path: str | Path, control_plan_path: str | Path) -> ValidationResult:
-    """Full pipeline: parse -> match -> evaluate -> score."""
-    pfmea = parse_pfmea(pfmea_path)
-    control_plan = parse_control_plan(control_plan_path)
+def check_files(
+    pfmea_path: str | Path,
+    control_plan_path: str | Path,
+    pfmea_sheet: str | None = None,
+    control_plan_sheet: str | None = None,
+) -> ValidationResult:
+    """Full pipeline: parse -> match -> evaluate -> score.
+
+    Optional `pfmea_sheet` / `control_plan_sheet` select a worksheet by name in multi-sheet
+    workbooks; when omitted the active sheet is used (unchanged default behaviour).
+    """
+    pfmea = parse_pfmea(pfmea_path, pfmea_sheet)
+    control_plan = parse_control_plan(control_plan_path, control_plan_sheet)
     match = match_rows(pfmea, control_plan)
     findings = evaluate(match)
     score, verdict = scoring.summarise(findings)

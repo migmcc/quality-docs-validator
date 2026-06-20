@@ -78,8 +78,9 @@ from YAML (a small rule-interpretation layer) is deferred to a later iteration �
 the hardening pass to avoid a rearchitecture.
 
 ## Known limitations (MVP)
-- **`.xlsx` only**, single worksheet; the header row is auto-located within the first few rows but
-  merged/multi-line header cells are not specially handled.
+- **`.xlsx` only**; one worksheet is read per file (selectable by name via `--pfmea-sheet` /
+  `--control-plan-sheet`, otherwise the active sheet). The header row is auto-located within the
+  first few rows, but merged/multi-line header cells are not specially handled.
 - **Recommended template + fixed aliases** only — no configurable column mapping (v0.2).
 - **Weak-method detection is heuristic** (phrase matching) and English-oriented; shipped as warnings.
 - **Matching is exact on normalised `operation_id`** — no fuzzy/description matching.

@@ -125,7 +125,7 @@ def _to_bool(value: object) -> bool:
 HEADER_SCAN_ROWS = 10  # how many leading rows to scan when locating the header row
 
 
-def _load_rows(path: Path) -> list[tuple]:
+def _load_rows(path: Path, sheet: str | None = None) -> list[tuple]:
     if not path.exists():
         raise ParseError(f"File not found: {path}")
     if path.suffix.lower() != ".xlsx":
@@ -137,14 +137,26 @@ def _load_rows(path: Path) -> list[tuple]:
         workbook = load_workbook(path, read_only=True, data_only=True)
     except Exception as exc:  # openpyxl raises a variety of types for corrupt/non-xlsx files
         raise ParseError(f"Could not open '{path.name}' as an .xlsx workbook: {exc}") from exc
-    sheet = workbook.active
+
     if sheet is None:
+        worksheet = workbook.active
+    elif sheet in workbook.sheetnames:
+        worksheet = workbook[sheet]
+    else:
+        available = ", ".join(f"'{name}'" for name in workbook.sheetnames) or "(none)"
+        workbook.close()
+        raise ParseError(
+            f"Worksheet '{sheet}' not found in '{path.name}'. Available sheets: {available}."
+        )
+
+    if worksheet is None:
         workbook.close()
         raise ParseError(f"Workbook '{path.name}' has no worksheets.")
-    rows = [r for r in sheet.iter_rows(values_only=True) if any(c is not None for c in r)]
+    rows = [r for r in worksheet.iter_rows(values_only=True) if any(c is not None for c in r)]
     workbook.close()
     if not rows:
-        raise ParseError(f"Worksheet in '{path.name}' is empty (no rows with content).")
+        target = f"Worksheet '{sheet}'" if sheet else "Worksheet"
+        raise ParseError(f"{target} in '{path.name}' is empty (no rows with content).")
     return rows
 
 
@@ -165,9 +177,9 @@ def _find_header(
     )
 
 
-def parse_pfmea(path: str | Path) -> list[PFMEARow]:
+def parse_pfmea(path: str | Path, sheet: str | None = None) -> list[PFMEARow]:
     path = Path(path)
-    rows = _load_rows(path)
+    rows = _load_rows(path, sheet)
     header_index, field_map = _find_header(rows, PFMEA_ALIASES, "PFMEA", path)
     data = rows[header_index + 1 :]
 
@@ -196,9 +208,9 @@ def parse_pfmea(path: str | Path) -> list[PFMEARow]:
     return out
 
 
-def parse_control_plan(path: str | Path) -> list[ControlPlanRow]:
+def parse_control_plan(path: str | Path, sheet: str | None = None) -> list[ControlPlanRow]:
     path = Path(path)
-    rows = _load_rows(path)
+    rows = _load_rows(path, sheet)
     header_index, field_map = _find_header(rows, CONTROL_PLAN_ALIASES, "Control Plan", path)
     data = rows[header_index + 1 :]
 

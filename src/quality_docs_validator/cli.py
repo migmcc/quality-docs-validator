@@ -57,6 +57,14 @@ def pfmea_control_plan(
     control_plan: Path = typer.Option(
         ..., "--control-plan", help="Path to the Control Plan .xlsx file."
     ),
+    pfmea_sheet: str = typer.Option(
+        None, "--pfmea-sheet", help="Worksheet name for the PFMEA (default: the active sheet)."
+    ),
+    control_plan_sheet: str = typer.Option(
+        None,
+        "--control-plan-sheet",
+        help="Worksheet name for the Control Plan (default: the active sheet).",
+    ),
     out: Path = typer.Option(
         Path("report.md"),
         "--out",
@@ -71,7 +79,7 @@ def pfmea_control_plan(
 ) -> None:
     """Check a PFMEA against a Control Plan for potential inconsistencies."""
     try:
-        result = check_files(pfmea, control_plan)
+        result = check_files(pfmea, control_plan, pfmea_sheet, control_plan_sheet)
     except ParseError as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=2) from exc
