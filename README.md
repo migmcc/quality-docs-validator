@@ -31,7 +31,8 @@ confidential supplier/customer data never leaves it.
 
 A single module: **PFMEA ↔ Control Plan consistency checker**.
 
-- Reads a PFMEA `.xlsx` and a Control Plan `.xlsx` (recommended template + simple column aliases).
+- Reads a PFMEA `.xlsx` and a Control Plan `.xlsx` (recommended template + common header aliases —
+  e.g. `Operation No`, `Op #`, `Severity Rating`, `Special Characteristic`, `Reaction Plan`).
 - Matches rows by `operation_id` / process step.
 - Applies six explicit, documented checks (see [docs/FINDINGS.md](docs/FINDINGS.md)):
   `UNMATCHED_PROCESS_STEP`, `MISSING_CONTROL`, `SPECIAL_CHARACTERISTIC_NOT_CONTROLLED`,

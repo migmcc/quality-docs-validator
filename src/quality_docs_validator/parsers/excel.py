@@ -22,28 +22,56 @@ class ParseError(Exception):
     """Raised when a file cannot be parsed into the expected document shape."""
 
 
-# Canonical field -> accepted normalised header aliases.
+# Canonical field -> accepted normalised header aliases. Headers are normalised (lowercased,
+# non-alphanumeric stripped) before matching, so "Operation No." == "operationno" and "Op #" == "op".
+# Aliases are deliberately specific; ambiguous generic tokens (control, method, description, number,
+# id, status) are not used as new aliases to avoid mis-mapping columns.
 PFMEA_ALIASES: dict[str, set[str]] = {
-    "operation_id": {"operationid", "opid", "opno", "operationno", "operation", "processnumber"},
-    "process_step": {"processstep", "processfunction", "operationdescription", "step", "processname"},
+    "operation_id": {
+        "operationid", "opid", "opno", "operationno", "operation", "processnumber",
+        "operationnumber", "opnumber", "op", "processno", "stepno",
+    },
+    "process_step": {
+        "processstep", "processfunction", "operationdescription", "step", "processname",
+        "processdescription", "stepdescription",
+    },
     "failure_mode": {"failuremode", "potentialfailuremode", "failure"},
     "effect": {"effect", "potentialeffect", "effectsoffailure"},
-    "severity": {"severity", "sev", "s"},
+    "severity": {"severity", "sev", "s", "severityrating"},
     "cause": {"cause", "potentialcause", "causeoffailure"},
     "prevention_control": {"preventioncontrol", "currentpreventioncontrol", "prevention"},
-    "detection_control": {"detectioncontrol", "currentdetectioncontrol", "currentcontrolsdetection"},
+    "detection_control": {
+        "detectioncontrol", "currentdetectioncontrol", "currentcontrolsdetection", "detectionmethod",
+    },
     "detection": {"detection", "det", "d"},
-    "special_characteristic": {"specialcharacteristic", "specialchar", "classification", "sc"},
+    "special_characteristic": {
+        "specialcharacteristic", "specialcharacteristics", "specialchar", "classification", "sc",
+        "keycharacteristic", "criticalcharacteristic",
+    },
 }
 
 CONTROL_PLAN_ALIASES: dict[str, set[str]] = {
-    "operation_id": {"operationid", "opid", "opno", "operationno", "operation", "processnumber"},
-    "process_step": {"processstep", "processname", "processdescription", "operationdescription", "step"},
+    "operation_id": {
+        "operationid", "opid", "opno", "operationno", "operation", "processnumber",
+        "operationnumber", "opnumber", "op", "processno", "stepno",
+    },
+    "process_step": {
+        "processstep", "processname", "processdescription", "operationdescription", "step",
+        "stepdescription",
+    },
     "characteristic": {"characteristic", "productcharacteristic", "processcharacteristic"},
-    "special_characteristic": {"specialcharacteristic", "specialchar", "classification", "sc"},
-    "control_method": {"controlmethod", "control", "method", "evaluationmeasurementtechnique"},
+    "special_characteristic": {
+        "specialcharacteristic", "specialcharacteristics", "specialchar", "classification", "sc",
+        "keycharacteristic", "criticalcharacteristic",
+    },
+    "control_method": {
+        "controlmethod", "control", "method", "evaluationmeasurementtechnique",
+        "controltechnique", "measurementtechnique",
+    },
     "detection_method": {"detectionmethod", "inspectionmethod", "evaluationmethod"},
-    "reaction_plan": {"reactionplan", "reaction", "responseplan", "correctiveaction"},
+    "reaction_plan": {
+        "reactionplan", "reaction", "responseplan", "correctiveaction", "outofcontrolaction",
+    },
 }
 
 _TRUE_TOKENS = {"yes", "y", "true", "1", "x", "cc", "sc", "critical", "significant", "*", "✓", "✔"}
