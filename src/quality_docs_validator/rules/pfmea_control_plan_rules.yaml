@@ -1,45 +1,89 @@
 # PFMEA <-> Control Plan validation rules.
 #
-# These six finding types are IMPLEMENTED in src/quality_docs_validator/modules/pfmea_control_plan.py.
-# For now this file documents them (id, severity, description); a later iteration will make the
-# module consume this YAML directly so checks can be edited without touching Python.
+# This file is the SINGLE SOURCE OF TRUTH for each rule's metadata: id, severity, title,
+# message_template and description/rationale. The detection logic itself lives in
+# src/quality_docs_validator/modules/pfmea_control_plan.py, which reads this metadata
+# (severity + message_template) instead of hardcoding it. This is intentionally NOT a generic
+# rule engine — the per-finding-type checks stay in Python.
+#
+# message_template placeholders (filled by the checker, per rule):
+#   {op}        operation id (all rules)
+#   {source}    "PFMEA" / "Control Plan"        (UNMATCHED_PROCESS_STEP)
+#   {target}    counterpart document             (UNMATCHED_PROCESS_STEP)
+#   {severity}  max PFMEA severity for the op    (MISSING_REACTION_PLAN, HIGH_SEVERITY_WEAK_CONTROL)
+#   {methods}   weak control method text         (WEAK_DETECTION_METHOD)
 #
 # Severity classification keeps the riskiest, false-positive-prone checks as WARNINGS (DECISIONS.md D3).
 
-version: 0
+version: 1
 
 rules:
-  - id: MISSING_CONTROL
-    severity: critical
-    description: >
-      A PFMEA failure mode / cause has no corresponding control in the Control Plan
-      for the matched operation.
-
   - id: UNMATCHED_PROCESS_STEP
     severity: warning
+    title: Unmatched process step
+    message_template: "{source} operation {op} has no matching row in the {target}."
     description: >
       A process step / operation_id present in one document has no counterpart in the other
       (surfaced rather than silently dropped).
+    rationale: >
+      A step planned in one document but absent from the other is a coverage gap, but it is also a
+      common artefact of differing numbering, so it is a warning rather than a failure.
+
+  - id: MISSING_CONTROL
+    severity: critical
+    title: Missing control
+    message_template: >-
+      Operation {op} has PFMEA failure mode(s) but no control method in the Control Plan.
+    description: >
+      A PFMEA failure mode / cause has no corresponding control in the Control Plan
+      for the matched operation.
+    rationale: >
+      A failure mode with no control is exactly the kind of gap audits and field escapes punish.
 
   - id: SPECIAL_CHARACTERISTIC_NOT_CONTROLLED
     severity: critical
+    title: Special characteristic not controlled
+    message_template: >-
+      Operation {op} is flagged as a special characteristic in the PFMEA but is not
+      marked/controlled as special in the Control Plan.
     description: >
       A special characteristic identified in the PFMEA is not present / not controlled in the
       Control Plan's inspection plan.
+    rationale: >
+      Special characteristics carry mandatory control expectations; a mismatch is high-risk.
 
   - id: MISSING_REACTION_PLAN
     severity: critical
+    title: Missing reaction plan
+    message_template: >-
+      Operation {op} has a high-severity failure mode (S={severity}) but the Control Plan
+      control has no reaction plan.
     description: >
       A Control Plan control lacks a reaction plan where the matched PFMEA risk is high.
+    rationale: >
+      When risk is highest, the absence of a documented reaction plan is a serious gap.
 
   - id: WEAK_DETECTION_METHOD
     severity: warning   # warning by decision D3 (false-positive-prone)
+    title: Weak detection method
+    message_template: "Operation {op} relies on a weak detection method ({methods})."
     description: >
-      The Control Plan detection method appears weak relative to the PFMEA detection ranking.
+      The Control Plan detection method appears weak (e.g. visual / manual inspection) relative to
+      the PFMEA detection ranking.
+    rationale: >
+      Weak detection lets defects through, but the judgement is heuristic and template-sensitive,
+      so it ships as a warning.
 
   - id: HIGH_SEVERITY_WEAK_CONTROL
     severity: warning   # warning by decision D3 (false-positive-prone)
+    title: High severity paired with weak control
+    message_template: >-
+      Operation {op} has a high-severity failure mode (S={severity}) paired with a weak
+      control method.
     description: >
       A high-severity failure mode is paired with a control judged weak for that severity.
+    rationale: >
+      High severity + weak control is a priority to revisit; kept a warning for the same
+      false-positive reason.
 
 # Further finding types (to reach the 11 total) are defined as the engine matures.

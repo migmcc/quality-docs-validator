@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- Rule metadata (id, severity, title, message template, description, rationale) is now loaded from
+  `rules/pfmea_control_plan_rules.yaml` instead of being hardcoded; the detection logic stays in
+  Python. Validation behaviour is unchanged (same finding types, severities, score and verdict),
+  verified by behaviour-parity tests. ([#1](https://github.com/migmcc/quality-docs-validator/issues/1))
+
 ## [0.2.0] - 2026-06-21
 
 ### Added

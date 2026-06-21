@@ -70,12 +70,23 @@ Score starts at 100 and is reduced per finding: **critical −15**, **warning �
 conservative so warnings cannot dominate the verdict (false-positive protection, [DECISIONS.md](DECISIONS.md) D3).
 Full detail and the per-type rationale live in [FINDINGS.md](FINDINGS.md).
 
-## Rules: code vs. YAML
-For the MVP the six checks are implemented in `modules/pfmea_control_plan.py`. The
-`rules/pfmea_control_plan_rules.yaml` file is the single source of truth for each rule's **id and
-severity**, and a consistency test asserts the code and YAML never drift. Driving the check *logic*
-from YAML (a small rule-interpretation layer) is deferred to a later iteration — it was kept out of
-the hardening pass to avoid a rearchitecture.
+## Rules: metadata in YAML, evaluation in Python
+`rules/pfmea_control_plan_rules.yaml` is the **single source of truth for rule metadata** — each
+rule's `id`, `severity`, `title`, `message_template`, `description` and `rationale`. The loader
+(`rules.load_rule_specs()` / `parse_rule_specs()`) reads and validates it, failing clearly on a
+missing id, missing required field, invalid severity, duplicate id or an empty ruleset.
+
+The checker in `modules/pfmea_control_plan.py` reads that metadata — it builds each `Finding` with
+the severity and the formatted `message_template` from the YAML rather than hardcoding them. The
+deliberate split is:
+
+- **YAML → rule metadata** (what a rule is, how severe it is, how it reads).
+- **Python → rule evaluation** (the per-finding-type detection logic stays in the module).
+
+This is intentionally *not* a generic rule engine: the bespoke evaluation logic remains in code.
+A consistency test plus behaviour-parity tests (seeded example, clean case, warnings case) ensure
+the YAML and the code never drift and that finding types, severities, count, score, verdict, and
+the Markdown/JSON output are unchanged from v0.2.
 
 ## Known limitations (MVP)
 - **`.xlsx` only**; one worksheet is read per file (selectable by name via `--pfmea-sheet` /
