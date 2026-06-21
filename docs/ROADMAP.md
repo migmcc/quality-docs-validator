@@ -22,10 +22,23 @@ merged to `main`; the `v0.2.0` tag/release is a separate step.
 Still out of scope for v0.2: CSV input, configurable column mapping, HTML output, UI, AI, and any
 new document pairs.
 
-## v0.3+ — Rule engine & more modules (each independent of the core)
-- **YAML-driven rules** ([#1](https://github.com/migmcc/quality-docs-validator/issues/1)) — make the
-  YAML the source of the rule *logic*, not just its documented metadata. Moved out of v0.2 because it
-  is a rule-engine refactor and must keep exact finding-type parity.
+## v0.3 — planned (YAML rules as source of truth)
+Tracked under the [v0.3 milestone](https://github.com/migmcc/quality-docs-validator/milestone/2).
+Deliberately small and low-risk — **no new features, no behaviour change**:
+
+- **YAML-driven rule *metadata*** ([#1](https://github.com/migmcc/quality-docs-validator/issues/1)) —
+  make `rules/pfmea_control_plan_rules.yaml` the single source of truth for each rule's **id,
+  severity, title/message template, description and rationale**, and have
+  `modules/pfmea_control_plan.py` read that metadata instead of hardcoding it. The **evaluation
+  logic stays in Python**; we are *not* building a generic rule engine.
+- **Parity tests** — prove the synthetic examples, a clean case and a warnings case produce the
+  exact same finding types, severities, count, score and verdict as v0.2 (Markdown + JSON unchanged).
+- **Rule documentation** generated/kept in sync from the YAML metadata.
+
+Out of scope for v0.3: new document pairs, CSV, configurable mapping, UI, AI, PyPI, new scoring,
+fuzzy matching, JSON-schema changes, and any change to the finding types.
+
+## v0.4+ — More modules (each independent of the core)
 - Process Flow ↔ PFMEA consistency.
 - Control Plan ↔ Work Instructions.
 - PPAP gap check.

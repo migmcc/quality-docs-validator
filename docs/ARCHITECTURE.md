@@ -73,9 +73,18 @@ Full detail and the per-type rationale live in [FINDINGS.md](FINDINGS.md).
 ## Rules: code vs. YAML
 For the MVP the six checks are implemented in `modules/pfmea_control_plan.py`. The
 `rules/pfmea_control_plan_rules.yaml` file is the single source of truth for each rule's **id and
-severity**, and a consistency test asserts the code and YAML never drift. Driving the check *logic*
-from YAML (a small rule-interpretation layer) is deferred to a later iteration — it was kept out of
-the hardening pass to avoid a rearchitecture.
+severity**, and a consistency test asserts the code and YAML never drift.
+
+**Planned for v0.3 (issue #1):** widen the YAML's role so it is the source of truth for each rule's
+*metadata* — id, severity, title/message template, description and rationale — with the module
+reading that metadata instead of hardcoding it. The deliberate split is:
+
+- **YAML → rule metadata** (what a rule is, how severe it is, how it reads).
+- **Python → rule evaluation** (the per-finding-type logic stays in `modules/pfmea_control_plan.py`).
+
+This is intentionally *not* a generic rule engine: the bespoke evaluation logic remains in code to
+avoid a rearchitecture, and any implementation must keep exact behaviour parity (same finding types,
+severities, count, score, verdict; Markdown and JSON unchanged).
 
 ## Known limitations (MVP)
 - **`.xlsx` only**; one worksheet is read per file (selectable by name via `--pfmea-sheet` /
