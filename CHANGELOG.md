@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-21
+
 ### Added
 - Multi-sheet workbook support: `--pfmea-sheet` / `--control-plan-sheet` select a worksheet by name
   (the active sheet is still used when omitted, so existing behaviour is unchanged). A missing sheet
@@ -57,5 +59,6 @@ First public release — the PFMEA ↔ Control Plan consistency checker MVP.
   rule source in a later iteration.
 - JSON/HTML output, CSV input and configurable column mapping remain roadmapped (v0.2).
 
-[Unreleased]: https://github.com/migmcc/quality-docs-validator/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/migmcc/quality-docs-validator/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/migmcc/quality-docs-validator/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/migmcc/quality-docs-validator/releases/tag/v0.1.0
