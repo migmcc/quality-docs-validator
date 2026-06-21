@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- Multi-sheet workbook support: `--pfmea-sheet` / `--control-plan-sheet` select a worksheet by name
+  (the active sheet is still used when omitted, so existing behaviour is unchanged). A missing sheet
+  raises a clear error listing the available sheet names. Header auto-detection still applies to the
+  selected sheet. ([#4](https://github.com/migmcc/quality-docs-validator/issues/4))
 - More common column-header aliases for both PFMEA and Control Plan (e.g. `Operation No`/`Op #`/
   `Process No`, `Severity Rating`, `Detection Method`, `Special Characteristics`/`Key
   Characteristic`/`Critical Characteristic`, `Control Technique`/`Measurement Technique`,

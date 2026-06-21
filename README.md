@@ -103,6 +103,19 @@ Markdown remains the default. The JSON contains `metadata` (tool, version, UTC t
 `verdict`, `score`, a `summary` (counts by severity and by finding type) and the full `findings`
 list.
 
+### Multi-sheet workbooks
+
+If a workbook has several sheets, pick the right one by name (otherwise the active sheet is used):
+
+```bash
+qdv pfmea-control-plan \
+  --pfmea pfmea.xlsx --pfmea-sheet "PFMEA" \
+  --control-plan control-plan.xlsx --control-plan-sheet "Control Plan" \
+  --out report.md
+```
+
+If the named sheet does not exist, the error lists the available sheet names.
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the module layout and data flow.
