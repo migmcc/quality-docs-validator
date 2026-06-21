@@ -6,9 +6,11 @@ the rationale for each, and how findings are turned into a score and verdict.
 > All findings are **potential** inconsistencies for a human to judge. The tool makes no regulatory
 > or normative conformance claim and does not replace technical review.
 
-The authoritative metadata (id + severity) also lives in
-[`src/quality_docs_validator/rules/pfmea_control_plan_rules.yaml`](../src/quality_docs_validator/rules/pfmea_control_plan_rules.yaml);
-a test keeps the YAML and the code in sync. The checks themselves are implemented in
+The authoritative rule **metadata** (id, severity, title, message template, description, rationale)
+is the
+[`rules/pfmea_control_plan_rules.yaml`](../src/quality_docs_validator/rules/pfmea_control_plan_rules.yaml)
+file; the checker reads it instead of hardcoding these values, and consistency + parity tests keep
+the YAML and the code in sync. The **detection logic** for each finding type is implemented in
 [`modules/pfmea_control_plan.py`](../src/quality_docs_validator/modules/pfmea_control_plan.py).
 
 ## Matching

@@ -1,10 +1,14 @@
 """PFMEA <-> Control Plan consistency checker (MVP module).
 
-This is the single module shipped in v0.1.0. It parses both documents, matches rows by operation,
-applies the explicit checks below and returns a scored `ValidationResult`. Each check is intentionally
-simple and documented; the tool surfaces *potential* findings for a human to judge.
+This is the single module shipped in v0.1. It parses both documents, matches rows by operation,
+applies the explicit checks below and returns a scored `ValidationResult`. Each check is
+intentionally simple and documented; the tool surfaces *potential* findings for a human to judge.
 
-Finding types implemented:
+Rule **metadata** (severity + message template) is loaded from
+`rules/pfmea_control_plan_rules.yaml`; the **detection logic** for each finding type stays in this
+module (this is not a generic rule engine).
+
+Finding types:
 - UNMATCHED_PROCESS_STEP              (warning)  operation present in one document only
 - MISSING_CONTROL                     (critical) matched operation has no control method
 - SPECIAL_CHARACTERISTIC_NOT_CONTROLLED (critical) PFMEA special char not marked in Control Plan
@@ -21,13 +25,9 @@ from ..core import scoring
 from ..core.matching import MatchResult, match_rows
 from ..models import ControlPlanRow, Finding, PFMEARow, ValidationResult
 from ..parsers.excel import parse_control_plan, parse_pfmea
+from ..rules import load_rule_specs
 
 HIGH_SEVERITY_THRESHOLD = 8
-
-# Phrases that indicate a subjective / low-reliability detection method. Kept deliberately
-# specific (phrases, not bare words like "operator" or "manual") to limit false positives:
-# e.g. "manual gauge" or "operator runs CMM" are NOT weak, but "manual inspection" is.
-# Because these checks are the most false-positive-prone, both rules they feed are WARNINGS (D3).
 WEAK_METHOD_KEYWORDS = (
     "visual",
     "by eye",
@@ -38,6 +38,20 @@ WEAK_METHOD_KEYWORDS = (
     "manual inspection",
     "manual check",
 )
+
+# Rule metadata (severity + message template) is the single source of truth in the YAML.
+_RULES = load_rule_specs()
+
+
+def _make(rule_id: str, op: str, **context: object) -> Finding:
+    """Build a Finding using the YAML metadata for severity and the message template."""
+    spec = _RULES[rule_id]
+    return Finding(
+        finding_type=rule_id,
+        level=spec["severity"],
+        operation_id=op,
+        message=spec["message_template"].format(op=op, **context),
+    )
 
 
 def _is_weak_method(method: str | None) -> bool:
@@ -68,69 +82,21 @@ def _check_operation(
     weak = any(_is_weak_method(m) for m in control_methods)
 
     if not has_control:
-        findings.append(
-            Finding(
-                finding_type="MISSING_CONTROL",
-                level="critical",
-                operation_id=op_label,
-                message=(
-                    f"Operation {op_label} has PFMEA failure mode(s) but no control method "
-                    f"in the Control Plan."
-                ),
-            )
-        )
+        findings.append(_make("MISSING_CONTROL", op_label))
 
     if pf_special and not cp_special:
-        findings.append(
-            Finding(
-                finding_type="SPECIAL_CHARACTERISTIC_NOT_CONTROLLED",
-                level="critical",
-                operation_id=op_label,
-                message=(
-                    f"Operation {op_label} is flagged as a special characteristic in the PFMEA "
-                    f"but is not marked/controlled as special in the Control Plan."
-                ),
-            )
-        )
+        findings.append(_make("SPECIAL_CHARACTERISTIC_NOT_CONTROLLED", op_label))
 
     if has_control and not has_reaction and max_sev is not None and max_sev >= HIGH_SEVERITY_THRESHOLD:
-        findings.append(
-            Finding(
-                finding_type="MISSING_REACTION_PLAN",
-                level="critical",
-                operation_id=op_label,
-                message=(
-                    f"Operation {op_label} has a high-severity failure mode (S={max_sev}) "
-                    f"but the Control Plan control has no reaction plan."
-                ),
-            )
-        )
+        findings.append(_make("MISSING_REACTION_PLAN", op_label, severity=max_sev))
 
     if weak:
         findings.append(
-            Finding(
-                finding_type="WEAK_DETECTION_METHOD",
-                level="warning",
-                operation_id=op_label,
-                message=(
-                    f"Operation {op_label} relies on a weak detection method "
-                    f"({', '.join(control_methods)})."
-                ),
-            )
+            _make("WEAK_DETECTION_METHOD", op_label, methods=", ".join(control_methods))
         )
 
     if weak and max_sev is not None and max_sev >= HIGH_SEVERITY_THRESHOLD:
-        findings.append(
-            Finding(
-                finding_type="HIGH_SEVERITY_WEAK_CONTROL",
-                level="warning",
-                operation_id=op_label,
-                message=(
-                    f"Operation {op_label} has a high-severity failure mode (S={max_sev}) "
-                    f"paired with a weak control method."
-                ),
-            )
-        )
+        findings.append(_make("HIGH_SEVERITY_WEAK_CONTROL", op_label, severity=max_sev))
 
     return findings
 
@@ -142,22 +108,12 @@ def evaluate(match: MatchResult) -> list[Finding]:
     for key in match.pfmea_only_ops:
         op = match.display_op(key)
         findings.append(
-            Finding(
-                finding_type="UNMATCHED_PROCESS_STEP",
-                level="warning",
-                operation_id=op,
-                message=f"PFMEA operation {op} has no matching row in the Control Plan.",
-            )
+            _make("UNMATCHED_PROCESS_STEP", op, source="PFMEA", target="Control Plan")
         )
     for key in match.control_only_ops:
         op = match.display_op(key)
         findings.append(
-            Finding(
-                finding_type="UNMATCHED_PROCESS_STEP",
-                level="warning",
-                operation_id=op,
-                message=f"Control Plan operation {op} has no matching row in the PFMEA.",
-            )
+            _make("UNMATCHED_PROCESS_STEP", op, source="Control Plan", target="PFMEA")
         )
 
     for key in match.matched_ops:
