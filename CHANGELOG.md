@@ -6,11 +6,14 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-21
+
 ### Changed
-- Rule metadata (id, severity, title, message template, description, rationale) is now loaded from
-  `rules/pfmea_control_plan_rules.yaml` instead of being hardcoded; the detection logic stays in
-  Python. Validation behaviour is unchanged (same finding types, severities, score and verdict),
-  verified by behaviour-parity tests. ([#1](https://github.com/migmcc/quality-docs-validator/issues/1))
+- Rule **metadata** (id, severity, title, message template, description, rationale) is now loaded
+  from `rules/pfmea_control_plan_rules.yaml` instead of being hardcoded. **Validation behaviour
+  remains unchanged** (same finding types, severities, score and verdict). The **evaluation logic
+  remains in Python** — **no generic rule engine** was added. Behaviour-parity tests protect the
+  existing outputs. ([#1](https://github.com/migmcc/quality-docs-validator/issues/1))
 
 ## [0.2.0] - 2026-06-21
 
@@ -65,6 +68,7 @@ First public release — the PFMEA ↔ Control Plan consistency checker MVP.
   rule source in a later iteration.
 - JSON/HTML output, CSV input and configurable column mapping remain roadmapped (v0.2).
 
-[Unreleased]: https://github.com/migmcc/quality-docs-validator/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/migmcc/quality-docs-validator/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/migmcc/quality-docs-validator/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/migmcc/quality-docs-validator/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/migmcc/quality-docs-validator/releases/tag/v0.1.0
