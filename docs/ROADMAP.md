@@ -6,24 +6,26 @@ severity-weighted score, Markdown report + terminal summary, synthetic examples,
 See [MVP_SCOPE.md](MVP_SCOPE.md). All work packages (repo skeleton, data models, Excel parser,
 matching, rules, scoring, report, CLI, examples, tests + CI, docs, release) are complete.
 
-## v0.2 — planned
-Improve interoperability and real-world workbook compatibility while keeping the tool focused on
-PFMEA ↔ Control Plan validation. Tracked under the
-[v0.2 milestone](https://github.com/migmcc/quality-docs-validator/milestone/1). Recommended order:
+## v0.2 — done (pending release)
+Interoperability and real-world workbook compatibility, kept focused on PFMEA ↔ Control Plan
+validation. Tracked under the
+[v0.2 milestone](https://github.com/migmcc/quality-docs-validator/milestone/1). All three items are
+merged to `main`; the `v0.2.0` tag/release is a separate step.
 
-1. **JSON output** ([#3](https://github.com/migmcc/quality-docs-validator/issues/3)) — first PR; a
-   machine-readable report alongside Markdown (Markdown stays the default).
-2. **More PFMEA / Control Plan column aliases**
-   ([#2](https://github.com/migmcc/quality-docs-validator/issues/2)) — broaden real-template coverage.
-3. **Multi-sheet workbooks** ([#4](https://github.com/migmcc/quality-docs-validator/issues/4)) —
-   optional sheet selection.
-4. **YAML-driven rules** ([#1](https://github.com/migmcc/quality-docs-validator/issues/1)) —
-   *stretch / optional*; a rule-engine refactor, deferred to v0.3 if scope grows.
+- ✅ **JSON output** ([#3](https://github.com/migmcc/quality-docs-validator/issues/3)) — a
+  machine-readable report alongside Markdown (Markdown stays the default).
+- ✅ **More PFMEA / Control Plan column aliases**
+  ([#2](https://github.com/migmcc/quality-docs-validator/issues/2)) — broader real-template coverage.
+- ✅ **Multi-sheet workbooks** ([#4](https://github.com/migmcc/quality-docs-validator/issues/4)) —
+  optional `--pfmea-sheet` / `--control-plan-sheet` selection.
 
 Still out of scope for v0.2: CSV input, configurable column mapping, HTML output, UI, AI, and any
-new document pairs. No dates promised.
+new document pairs.
 
-## v0.3+ — More modules (each independent of the core)
+## v0.3+ — Rule engine & more modules (each independent of the core)
+- **YAML-driven rules** ([#1](https://github.com/migmcc/quality-docs-validator/issues/1)) — make the
+  YAML the source of the rule *logic*, not just its documented metadata. Moved out of v0.2 because it
+  is a rule-engine refactor and must keep exact finding-type parity.
 - Process Flow ↔ PFMEA consistency.
 - Control Plan ↔ Work Instructions.
 - PPAP gap check.
