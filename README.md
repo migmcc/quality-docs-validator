@@ -2,6 +2,8 @@
 
 ### Catch potential inconsistencies between PFMEA and Control Plan — before technical review
 
+![Workflow diagram: PFMEA and Control Plan XLSX files are checked against six explicit rules, then reviewed by a human engineer](docs/assets/validation-flow.svg)
+
 A **local-first Python CLI** for quality, process and manufacturing engineers. Compare two `.xlsx` workbooks, surface severity-classified **potential findings**, and produce Markdown or JSON reports without sending your files to a cloud service.
 
 [![CI](https://github.com/migmcc/quality-docs-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/migmcc/quality-docs-validator/actions/workflows/ci.yml)
