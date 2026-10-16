@@ -28,6 +28,8 @@ qdv pfmea-control-plan \
   --out report.md
 ```
 
+![Illustrated terminal output from bundled synthetic example: 43/100, FAIL, three critical and three warnings](docs/assets/example-output.svg)
+
 **Documented sample terminal output (abridged):**
 
 ```text
