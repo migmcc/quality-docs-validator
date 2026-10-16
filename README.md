@@ -1,58 +1,79 @@
-# quality-docs-validator
+# Quality Docs Validator
+
+### Catch potential inconsistencies between PFMEA and Control Plan — before technical review
+
+![Workflow diagram: PFMEA and Control Plan XLSX files are checked against six explicit rules, then reviewed by a human engineer](docs/assets/validation-flow.svg)
+
+A **local-first Python CLI** for quality, process and manufacturing engineers. Compare two `.xlsx` workbooks, surface severity-classified **potential findings**, and produce Markdown or JSON reports without sending your files to a cloud service.
 
 [![CI](https://github.com/migmcc/quality-docs-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/migmcc/quality-docs-validator/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
 
-> Detect **potential inconsistencies between PFMEA and Control Plan** before audits, customer
-> submissions or production issues — locally, with simple files, explicit rules and clear reports.
+**[Quick start](#quick-start)** · **[See a real example](#see-it-in-action)** · **[What it checks](#what-it-validates)** · **[Limitations](#what-it-does-not-validate-by-design)** · **[Architecture](docs/ARCHITECTURE.md)**
 
-`quality-docs-validator` (CLI: `qdv`) is a **local-first, forkable** tool for quality engineers.
+---
+
+## See it in action
+
+Run the **bundled synthetic example** containing deliberately seeded gaps:
+
+```bash
+git clone https://github.com/migmcc/quality-docs-validator.git
+cd quality-docs-validator
+pip install -e .
+qdv pfmea-control-plan \
+  --pfmea examples/pfmea.xlsx \
+  --control-plan examples/control-plan.xlsx \
+  --out report.md
+```
+
+![Illustrated terminal output from bundled synthetic example: 43/100, FAIL, three critical and three warnings](docs/assets/example-output.svg)
+
+**Documented sample terminal output (abridged):**
+
+```text
+Potential findings
+  UNMATCHED_PROCESS_STEP                 warning    Op 40
+  SPECIAL_CHARACTERISTIC_NOT_CONTROLLED  critical   Op 20
+  MISSING_REACTION_PLAN                  critical   Op 20
+  WEAK_DETECTION_METHOD                  warning    Op 20
+  HIGH_SEVERITY_WEAK_CONTROL             warning    Op 20
+  MISSING_CONTROL                        critical   Op 30
+
+Score: 43/100    Verdict: FAIL
+Critical: 3      Warnings: 3
+```
+
+[Read the full committed sample report →](examples/report.md)
+
+> **Important:** Findings are *potential inconsistencies* for an engineer to judge. This is **not** a regulatory or standards compliance certification and **does not replace human technical review**.
 
 ## The problem
 
-Quality documents are reviewed one at a time, but the real risk lives **between** them: a
-high-severity PFMEA failure mode with no matching Control Plan control, a special characteristic
-missing from the inspection plan, a missing reaction plan exactly where risk is highest. These gaps
-surface late — at audits, customer submissions or as field complaints. This tool cross-checks the
-two documents and surfaces those gaps as **severity-classified potential findings**.
-
-> ⚠️ It **supports, and does not replace, human technical review.** Findings are *potential*
-> inconsistencies for an engineer to judge; the tool makes no regulatory or normative conformance
-> claim.
+A PFMEA and its Control Plan can look complete when reviewed separately while disagreeing **between** documents: an unmatched process step, a special characteristic not reflected in controls, or no reaction plan where severity is high. Those gaps deserve attention before an audit or submission.
 
 ## Who it's for
 
-Quality / Process / Manufacturing Engineers, SQEs, internal auditors and APQP/PPAP teams — and
-anyone using coding agents to automate quality workflows. Runs entirely on your machine, so
-confidential supplier/customer data never leaves it.
+Quality / Process / Manufacturing Engineers, supplier-quality teams, internal auditors and APQP/PPAP teams working with Excel-based documents.
 
 ## What it validates
 
-A single module: **PFMEA ↔ Control Plan consistency checker**.
+The current module is a **PFMEA ↔ Control Plan consistency checker**.
 
-- Reads a PFMEA `.xlsx` and a Control Plan `.xlsx` (recommended template + common header aliases —
-  e.g. `Operation No`, `Op #`, `Severity Rating`, `Special Characteristic`, `Reaction Plan`).
-- Matches rows by `operation_id` / process step.
-- Applies six explicit, documented checks (see [docs/FINDINGS.md](docs/FINDINGS.md)):
-  `UNMATCHED_PROCESS_STEP`, `MISSING_CONTROL`, `SPECIAL_CHARACTERISTIC_NOT_CONTROLLED`,
-  `MISSING_REACTION_PLAN`, `WEAK_DETECTION_METHOD` (warning), `HIGH_SEVERITY_WEAK_CONTROL` (warning).
-- Computes a **severity-weighted score (0–100)** with verdict bands
-  (PASS / PASS-WITH-WARNINGS / NEEDS-REVIEW / FAIL).
-- Generates a **Markdown report** plus a **rich terminal summary**.
+| Capability | How it works |
+| --- | --- |
+| Excel input | Reads PFMEA and Control Plan `.xlsx` workbooks, with a recommended template and common header aliases. |
+| Matching | Matches normalised operation IDs and process steps. |
+| Six checks | Flags unmatched steps, missing controls, uncontrolled special characteristics, missing reaction plans and two warning-level weak-method heuristics. |
+| Scoring | Severity-weighted 0–100 score with PASS / PASS-WITH-WARNINGS / NEEDS-REVIEW / FAIL verdicts. |
+| Reports | Rich terminal summary plus Markdown or JSON, suitable for review and automation. |
 
-## What it does *not* validate (by design)
+**[Read the exact finding triggers and scoring rules →](docs/FINDINGS.md)**
 
-- ❌ CSV / other input formats — `.xlsx` only (CSV planned for v0.2).
-- ❌ Configurable column mapping — recommended template + fixed aliases only (v0.2).
-- ❌ Other document pairs (Process Flow ↔ PFMEA, Work Instructions, PPAP, 8D, SPC, MSA).
-- ❌ Web UI, ERP/MES/QMS integration, PDF/OCR, or any AI dependency.
-- ❌ Regulatory/standard conformance certification, or replacing human judgement.
+## Quick start
 
-Scope is deliberately narrow — see [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md),
-[docs/DECISIONS.md](docs/DECISIONS.md) and the [roadmap](docs/ROADMAP.md).
-
-## Quickstart
+**Requirements:** Python 3.12+ and a local checkout of this repository.
 
 ```bash
 pip install -e .
@@ -62,35 +83,9 @@ qdv pfmea-control-plan \
   --out report.md
 ```
 
-This runs against the bundled synthetic examples (which contain a deliberately seeded gap) and
-writes `report.md` plus a terminal summary. Regenerate the examples with
-`python examples/generate_examples.py`.
+The bundled examples are synthetic and intentionally contain a gap. To regenerate them, run `python examples/generate_examples.py`.
 
-Expected terminal summary (abridged):
-
-```text
-                       Potential findings
-  Type                                   Level     Op  Detail
- ─────────────────────────────────────────────────────────────────
-  UNMATCHED_PROCESS_STEP                 warning   40  no Control Plan row
-  SPECIAL_CHARACTERISTIC_NOT_CONTROLLED  critical  20  not marked special in CP
-  MISSING_REACTION_PLAN                  critical  20  S=9, no reaction plan
-  WEAK_DETECTION_METHOD                  warning   20  visual inspection
-  HIGH_SEVERITY_WEAK_CONTROL             warning   20  S=9 + weak control
-  MISSING_CONTROL                        critical  30  no control method
-
-╭───────────────── quality-docs-validator ─────────────────╮
-│ Score: 43/100   Verdict: FAIL   Critical: 3   Warnings: 3 │
-╰───────────────────────────────────────────────────────────╯
-```
-
-The full Markdown report is written to `report.md`; a committed sample lives at
-[examples/report.md](examples/report.md). Finding types and scoring are documented in
-[docs/FINDINGS.md](docs/FINDINGS.md).
-
-### JSON output
-
-For automation, emit a machine-readable report with `--format json`:
+### JSON output for automation
 
 ```bash
 qdv pfmea-control-plan \
@@ -99,13 +94,9 @@ qdv pfmea-control-plan \
   --format json --out report.json
 ```
 
-Markdown remains the default. The JSON contains `metadata` (tool, version, UTC timestamp),
-`verdict`, `score`, a `summary` (counts by severity and by finding type) and the full `findings`
-list.
+The JSON report includes metadata, verdict, score, summary and findings.
 
-### Multi-sheet workbooks
-
-If a workbook has several sheets, pick the right one by name (otherwise the active sheet is used):
+### Select sheets in multi-sheet workbooks
 
 ```bash
 qdv pfmea-control-plan \
@@ -114,12 +105,28 @@ qdv pfmea-control-plan \
   --out report.md
 ```
 
-If the named sheet does not exist, the error lists the available sheet names.
+If a specified sheet does not exist, the error lists available sheet names.
 
-## Architecture
+## What it does not validate (by design)
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the module layout and data flow.
+- Formats other than `.xlsx`; CSV is not currently supported.
+- Arbitrary column mapping beyond the recommended template and supported aliases.
+- Other document pairs (Process Flow, Work Instructions, PPAP, 8D, SPC, MSA).
+- Web interface, ERP / MES / QMS integration, PDF / OCR or AI-based interpretation.
+- Regulatory conformity, audit certification or replacements for engineering judgement.
 
-## License
+See [scope](docs/MVP_SCOPE.md), [decisions](docs/DECISIONS.md) and [roadmap](docs/ROADMAP.md).
 
-[MIT](LICENSE). Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+## How it works
+
+`PFMEA.xlsx + Control Plan.xlsx → operation matching → six checks → scoring → terminal / Markdown / JSON`
+
+The rules and scoring are explicitly documented and testable rather than based on an LLM. For implementation details, see [architecture](docs/ARCHITECTURE.md) and [finding reference](docs/FINDINGS.md).
+
+## Get involved
+
+- [Explore the repository](https://github.com/migmcc/quality-docs-validator)
+- [Open an issue](https://github.com/migmcc/quality-docs-validator/issues)
+- [Contribute](CONTRIBUTING.md)
+
+Licensed under [MIT](LICENSE).
