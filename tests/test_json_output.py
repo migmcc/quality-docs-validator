@@ -55,7 +55,7 @@ def test_json_generated_with_flag(example_files, tmp_path: Path) -> None:
     assert out.exists()
     # Parseable JSON.
     data = json.loads(out.read_text(encoding="utf-8"))
-    assert set(["metadata", "verdict", "score", "summary", "findings"]) <= set(data)
+    assert {"metadata", "verdict", "score", "summary", "findings"} <= set(data)
 
 
 def test_json_metadata_shape(example_files, tmp_path: Path) -> None:
