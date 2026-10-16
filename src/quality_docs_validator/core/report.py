@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from rich.console import Console
@@ -36,7 +36,7 @@ _VERDICT_STYLE = {
 
 
 def render_markdown(result: ValidationResult, pfmea_name: str, control_plan_name: str) -> str:
-    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    generated = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     lines: list[str] = []
     lines.append("# PFMEA ↔ Control Plan Validation Report")
     lines.append("")
@@ -93,7 +93,7 @@ def build_report_data(
         "metadata": {
             "tool": TOOL_NAME,
             "version": __version__,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "format": "json",
         },
         "inputs": {
